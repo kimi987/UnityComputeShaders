@@ -44,7 +44,18 @@ public class ParticleFun : MonoBehaviour
 
         for (int i = 0; i < particleCount; i++)
         {
-            //TO DO: Initialize particle
+            Vector3 v = new Vector3();
+            v.x = Random.value * 2 - 1.0f;
+            v.y = Random.value * 2 - 1.0f;
+            v.z = Random.value * 2 - 1.0f;
+            v.Normalize();
+            v *= Random.value * 0.5f;
+
+            particleArray[i].position = new Vector3(v.x, v.y, v.z + 3);
+            particleArray[i].velocity = Vector3.zero;
+
+            particleArray[i].life = Random.value * 5.0f + 1.0f;
+            
         }
 
         // create compute buffer
@@ -86,6 +97,7 @@ public class ParticleFun : MonoBehaviour
 
         // Send datas to the compute shader
         shader.SetFloat("deltaTime", Time.deltaTime);
+        shader.SetFloat("time", Time.time);
         shader.SetFloats("mousePosition", mousePosition2D);
 
         // Update the Particles

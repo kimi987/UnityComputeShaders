@@ -10,6 +10,8 @@ public class SolidColor : MonoBehaviour
     Renderer rend;
     RenderTexture outputTexture;
 
+    private string kernelName = "Square";
+
     int kernelHandle;
 
     // Use this for initialization
@@ -27,10 +29,10 @@ public class SolidColor : MonoBehaviour
 
     private void InitShader()
     {
-        kernelHandle = shader.FindKernel("CSMain");
+        kernelHandle = shader.FindKernel(kernelName);
 
         shader.SetTexture(kernelHandle, "Result", outputTexture);
- 
+        shader.SetInt("texResolution", texResolution);
         rend.material.SetTexture("_MainTex", outputTexture);
 
         DispatchShader(texResolution / 8, texResolution / 8);

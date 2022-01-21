@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteInEditMode]
+// [ExecuteInEditMode]
 public class Challenge3 : BaseCompletePP
 {
     [Range(0.0f, 1.0f)]

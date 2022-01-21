@@ -10,6 +10,8 @@ float edgeWidth;
 float shade;
 float4 center;
 int blurRadius;
+int sourceLengthX;
+int sourceLengthY;
 
 float inCircle( float2 pt, float2 center, float radius, float edgeWidth ){
     float len = length(pt - center);
@@ -18,15 +20,48 @@ float inCircle( float2 pt, float2 center, float radius, float edgeWidth ){
 
 [numthreads(8, 8, 1)]
 void HorzPass(uint3 id : SV_DispatchThreadID)
-{
+{   
+    int left = max(0, (int) id.x - blurRadius);
     
+    int count = min(blurRadius, (int)id.x) + min(blurRadius, sourceLengthX - (int)id.x);
+    float4 color = 0;
+    uint2 index = uint2((uint)left, id.y);
+    [unroll(100)]
+    for(int x=0; x< count; x++)
+    {
+        color += source[index];
+        index.x++;
+    }
+
+    color /= (float) count;
+
+    float4 srcColor = source[id.xy];
+    float4 shadedBlurColor = color * shade;
+    float hightLight = inCircle((float2)id.xy, center.xy, radius, edgeWidth);
+    color = lerp(shadedBlurColor, srcColor, hightLight);
+    horzOutput[id.xy] = color;
 }
 
 [numthreads(8, 8, 1)]
 void Highlight(uint3 id : SV_DispatchThreadID)
 {
-    float4 color = source[id.xy];
+    float4 color = 0;
 
+    int bottom = max(0, (int)id.y - blurRadius);
+    int count = min(blurRadius, (int)id.y) + min(blurRadius, sourceLengthY - (int)id.y);
+    uint2 index = uint2(id.x, (uint) bottom);
+    [unroll(100)]
+    for (int y = 0; y < count; y++)
+    {
+        color += source[index];
+        index.y ++;
+    }
+    color /= (float)count;
+    float4 srcColor = source[id.xy];
+    float4 shadedBlurColor = color * shade;
+    float hightLight = inCircle((float2)id.xy, center.xy, radius, edgeWidth);
+    
+    color = lerp(shadedBlurColor, srcColor, hightLight);
+    
     output[id.xy] = color;
-
 }

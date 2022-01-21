@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteInEditMode]
+// [ExecuteInEditMode]
 public class NightVision : BaseCompletePP
 {
     [Range(0.0f, 100.0f)]
@@ -31,6 +31,8 @@ public class NightVision : BaseCompletePP
         shader.SetVector("tintColor", tint);
         shader.SetFloat("tintStrength", tintStrength);
         shader.SetInt("lines", lines);
+        shader.SetInt("sourceWidth", texSize.x);
+        shader.SetInt("sourceHeight", texSize.y);
     }
 
     protected override void OnRenderImage(RenderTexture source, RenderTexture destination)

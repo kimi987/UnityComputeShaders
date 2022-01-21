@@ -10,6 +10,11 @@ float4 tintColor;
 float tintStrength;
 float time;
 
+float4 center;
+
+int sourceWidth;
+int sourceHeight;
+
 float random (float2 pt, float seed) {
     const float a = 12.9898;
     const float b = 78.233;
@@ -25,7 +30,29 @@ float inCircle( float2 pt, float2 center, float radius, float edgeWidth ){
 [numthreads(8, 8, 1)]
 void CSMain(uint3 id : SV_DispatchThreadID)
 {
-    float3 finalColor = source[id.xy].rgb;
+    uint2 index = (uint2(id.x, id.y)/3) * 3;
+
+    float noise = random((float2)id.xy, time);
+    float3 srcColor = lerp(source[id.xy].rgb*2, source[index].rgb, noise);
+
+    float3 grayScale = (srcColor.r + srcColor.g + srcColor.g) / 3.0f;
+
+    float3 tinted = grayScale * tintColor.rgb;
+    
+    float3 finalColor = lerp(srcColor, tinted, tintStrength);
+
+    float uvY = (float)id.y/(float)sourceHeight;
+
+    float scanline = saturate(smoothstep(0.1, 0.2, frac(uvY * lines + time * 3)) + 0.3);
+
+    finalColor = lerp(source[id.xy].rgb * 0.5, finalColor, scanline);
+
+    float2 center = float2(sourceWidth * 0.3,  sourceHeight * 0.5);
+    float highLight = inCircle(float2(id.xy), center, radius, edgeWidth);
+    center.x = sourceWidth * 0.7;
+    highLight += inCircle(float2(id.xy), center, radius, edgeWidth);
+
+    finalColor = lerp(float4(0,0,0,1), finalColor,  saturate(highLight));
            
     output[id.xy] = float4(finalColor, 1);
 }

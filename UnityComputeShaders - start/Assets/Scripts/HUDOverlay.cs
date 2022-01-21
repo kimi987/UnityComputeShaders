@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteInEditMode]
+// [ExecuteInEditMode]
 public class HUDOverlay : BaseCompletePP
 {
     public Color axisColor = new Color(0.8f, 0.8f, 0.8f, 1);
@@ -20,6 +20,8 @@ public class HUDOverlay : BaseCompletePP
     {
         shader.SetVector("axisColor", axisColor);
         shader.SetVector("sweepColor", sweepColor);
+        shader.SetInt("sourceWidth", renderedSource.width);
+        shader.SetInt("sourceHeight", renderedSource.height);
     }
 
     protected override void OnRenderImage(RenderTexture source, RenderTexture destination)
